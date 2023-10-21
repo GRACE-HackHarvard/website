@@ -19,19 +19,31 @@
 {% block content %}
 
 <div>
-      <nav>
+    <nav>
         <div class="flex w-full justify-between items-center lg:px-4 md:px-3 sm:px-2 h-[7vh] bg-black">
-          <div class="flex justify-center items-center whitespace-nowrap">
-            <img src="../static/logo.svg" alt="logo" class="h-10 mr-2">
-          </div>
-          <div id="navleft" class="flex w-full justify-end items-center lg:px-4 md:px-3 sm:px-2 h-[7vh] bg-black">
-              <a href="/" class="text-white font-bold p-2">Home</a>
-              <a href="/about" class="text-white p-2 font-bold">About</a>
-              <a href="/map" class="text-white p-2 font-bold">Star Map</a>
-          </div>
+            <div class="flex justify-center items-center whitespace-nowrap">
+                <img src="../static/logo.svg" alt="logo" class="h-10 mr-2">
+                <a href="/" class="text-purple-500 font-bold p-2 text-lg">GRACE</a> 
+            </div>
+            <div id="navleft" class="flex w-full justify-end items-center lg:px-4 md:px-3 sm:px-2 h-[7vh] bg-black">
+                <a href="/" class="text-white font-bold p-2">Home</a>
+                <a href="/about" class="text-white p-2 font-bold">About</a>
+                <a href="/map" class="text-white p-2 font-bold">Star Map</a>
+            </div>
+      </div>
+    </nav>
+    <div class="flex w-full">
+        <div id="starmap" style="width:100%;height:93vh;"></div>
+        <div>
+            <iframe id="myIframe" src="http://server1.sky-map.org/skywindow?object=M100&zoom=8&img_source=SDSS" width=400 height=320>
+            </iframe>
+            <div class="flex-col">
+                <p id="objectName">M1006</p>
+                <p id="objectRA"></p>
+                <p id="objectDEC"></p>
+            </div>
         </div>
-      </nav>
-    <div id="starmap" style="width:100%;height:93vh;"></div>
+    </div>
 </div>
 
 {% endblock %}
@@ -43,23 +55,66 @@
 <script src="{{ url_for('static', filename='js/stuquery.min.js') }}"></script>
 <script src="{{ url_for('static', filename='js/virtualsky.min.js') }}"></script>
 <script>
+    function decimalToDMS(decimal) {
+      // Get the degrees
+      var degrees = Math.floor(decimal);
+
+      // Calculate the remaining minutes
+      var minutesDecimal = (decimal - degrees) * 60;
+      var minutes = Math.floor(minutesDecimal);
+
+      // Calculate the remaining seconds
+      var seconds = (minutesDecimal - minutes) * 60;
+
+      return degrees + " " + minutes + " " + seconds.toFixed(2);
+    }
+
     var planetarium;
+
+    // We vary shown_objects based on user input; 
+    // e.g. if they enable Messier catalogues, 
+    // then we add "messier.json" to the shown_objects
+    // string so it can be rerendered like below
+    var shown_objects = "../static/js/messier.json";
 
     // Pass in a JSON object
     var input = {
-                id: 'starmap',
-                projection: 'stereo', 
-                live: false,
-                gridlines_az: false,
-			    latitude: 34.4326, 
-			    longitude: -119.86286,
-                constellations: false,
-                showposition: false,
-                showgalaxy: false,
+        id: 'starmap',
+        projection: 'stereo', 
+        live: false,
+        gridlines_az: false,
+        latitude: 34.4326, 
+        longitude: -119.86286,
+        showposition: false,
+        constellations: true,
+        constellationlabels: true,
+        // objects: shown_objects,
+        callback: {
+            'click': function(e){
+                e.nearest = e.data.sky.nearestObject(e.x,e.y);
+                console.log(e.nearest);
+                changeIFRAME(e.nearest);
+            }
+        } 
     };
 
     S(document).ready(function() {
-        S.virtualsky(input);
+        planetarium = S.virtualsky(input);
     });
+    
+    function changeIFRAME(nearest) {
+        var ra = decimalToDMS(nearest.data.ra);
+        var dec = decimalToDMS(nearest.data.dec);
+        console.log(nearest);
+
+        var src = "http://www.sky-map.org/skywindow?object=" 
+                + nearest.label.toLowerCase() + "&zoom=8" +
+                "&box_color=green&box_width=100&box_height=100&img_source=DSS2";
+        console.log(src)
+        document.getElementById('objectName').innerText = nearest.label;
+        document.getElementById('objectRA').innerText = nearest.data.ra;
+        document.getElementById('objectDEC').innerText = nearest.data.dec;
+        document.getElementById('myIframe').src = src;
+    }  
 </script>
 {% endblock %}
