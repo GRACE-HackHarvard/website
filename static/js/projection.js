@@ -3,5 +3,5 @@ var socket = io.connect('http://' + document.domain + ':' + location.port);
          console.log('connected');
     });
     socket.on('message', function(data) {
-         console.log(data);
+         // console.log(data);
     });

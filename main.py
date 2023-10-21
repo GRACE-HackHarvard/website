@@ -45,7 +45,7 @@ def background_thread():
         newval = video_stream.get_frame() 
         if newval != oldval:
             oldval = newval
-            print(newval)
+            # print(newval)
             socketio.emit('message', {'velocity': newval})                                        
         time.sleep(0.033)                                                           
 
@@ -59,10 +59,17 @@ def connect():
 def index():
     return render_template('index.html')
 
+@app.route('/about')
+def about():
+    return render_template('about.html')
+
+@app.route('/map') 
+def map(): 
+	return render_template('map.html')
+
 @app.route('/video_feed')
 def video_feed():
-     return Response(gen(video_stream),
-                    mimetype='multipart/x-mixed-replace; boundary=frame')
+    return Response(gen(video_stream), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 if __name__ == '__main__':
     socketio.run(app, host='127.0.0.1', debug=True,port="5001")
