@@ -39,10 +39,10 @@
         <div>
             <iframe id="myIframe" src="http://server1.sky-map.org/skywindow?object=M100&zoom=8&img_source=SDSS" width=400 height=320>
             </iframe>
-            <div class="flex-col bg-gray-500 m-2 h-full w-full">
-                <p id="objectName">No Object Selected</p>
-                <p id="objectRA">Right Ascension (East-West): No Object Selected</p>
-                <p id="objectDEC">Declination (North-South): No Object Selected</p>
+            <div class="flex-col p-2 h-full w-full bg-gray-400">
+                <p id="objectName" class="text-white font-bold">No Object Selected</p>
+                <p id="objectRA" class="text-white font-bold">Right Ascension (East-West): No Object Selected</p>
+                <p id="objectDEC" class="text-white font-bold">Declination (North-South): No Object Selected</p>
             </div>
         </div>
     </div>
@@ -107,8 +107,8 @@
     });
     
     function changeIFRAME(nearest) {
-        var ra = decimalToDMS(nearest.data.ra);
-        var dec = decimalToDMS(nearest.data.dec);
+        var ra = decToDMS(nearest.data.ra, 1);
+        var dec = decToDMS(nearest.data.dec, 0);
 
         var src = "http://www.sky-map.org/skywindow?object=" 
                 + nearest.label.toLowerCase() + "&zoom=5" +
