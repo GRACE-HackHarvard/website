@@ -37,10 +37,10 @@
         <div>
             <iframe id="myIframe" src="http://server1.sky-map.org/skywindow?object=M100&zoom=8&img_source=SDSS" width=400 height=320>
             </iframe>
-            <div class="flex-col">
-                <p id="objectName">M1006</p>
-                <p id="objectRA"></p>
-                <p id="objectDEC"></p>
+            <div class="flex-col bg-gray-500 m-2 h-full w-full">
+                <p id="objectName">No Object Selected</p>
+                <p id="objectRA">Right Ascension (East-West): No Object Selected</p>
+                <p id="objectDEC">Declination (North-South): No Object Selected</p>
             </div>
         </div>
     </div>
@@ -55,7 +55,7 @@
 <script src="{{ url_for('static', filename='js/stuquery.min.js') }}"></script>
 <script src="{{ url_for('static', filename='js/virtualsky.min.js') }}"></script>
 <script>
-    function decimalToDMS(decimal) {
+    function decToDMS(decimal, form) {
       // Get the degrees
       var degrees = Math.floor(decimal);
 
@@ -66,7 +66,11 @@
       // Calculate the remaining seconds
       var seconds = (minutesDecimal - minutes) * 60;
 
-      return degrees + " " + minutes + " " + seconds.toFixed(2);
+      if(form == 0) {
+        return degrees + "° " + minutes + "' " + seconds.toFixed(2) + "'' ";
+      } else {
+        return degrees + "h " + minutes + "m " + seconds.toFixed(2) + "s ";
+      }
     }
 
     var planetarium;
@@ -81,7 +85,7 @@
     var input = {
         id: 'starmap',
         projection: 'stereo', 
-        live: false,
+        live: true,
         gridlines_az: false,
         latitude: 34.4326, 
         longitude: -119.86286,
@@ -105,15 +109,14 @@
     function changeIFRAME(nearest) {
         var ra = decimalToDMS(nearest.data.ra);
         var dec = decimalToDMS(nearest.data.dec);
-        console.log(nearest);
 
         var src = "http://www.sky-map.org/skywindow?object=" 
-                + nearest.label.toLowerCase() + "&zoom=8" +
+                + nearest.label.toLowerCase() + "&zoom=5" +
                 "&box_color=green&box_width=100&box_height=100&img_source=DSS2";
         console.log(src)
         document.getElementById('objectName').innerText = nearest.label;
-        document.getElementById('objectRA').innerText = nearest.data.ra;
-        document.getElementById('objectDEC').innerText = nearest.data.dec;
+        document.getElementById('objectRA').innerText = "Right Ascension (East-West): " + ra;
+        document.getElementById('objectDEC').innerText = "Declination (North-South): " +dec;
         document.getElementById('myIframe').src = src;
     }  
 </script>
