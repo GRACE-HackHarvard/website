@@ -2,20 +2,96 @@
 
 {% block head %}
     <link href="{{ url_for('static', filename='css/home.css') }}" rel="stylesheet">
+    <link href="https://cdn.rawgit.com/michalsnik/aos/2.1.1/dist/aos.css" rel="stylesheet">
 {% endblock %}
 
 {% block content %}
+    <div class="bg-black p-6 flex items-center">
+        <div data-aos="fade-up" class="flex-1 text-white space-y-4 m-6">
+            <h1 class="text-7xl font-bold ml-2">Introducing GRACE</h1>
+            <p class="font-semibold text-3xl ml-2">A Generative Real-Time Astronomy & Celestial Experience</p>
+            <br>
+            <p class="text-xl ml-2 mr-20">Using only a projector and a camera, you can explore an immersive star map, effortlessly scrolling with just your arm and researching the celestial unknown with AI.</p>
+        </div>
+        <img src="{{ url_for('static', filename='images/stars.svg') }}" alt="Stars SVG" class="w-96 h-96 ml-35 mr-4">
+    </div>
+    
+    <div data-aos="fade-up" class="p-6 flex flex-col items-center">
+        <div class="flex-1 text-black space-y-4 pr-6 items-right m-10">
+            <h2 class="text-4xl font-semibold">Inspiration</h2>
+            <p class="text-lg">Many of us never had the privilege of genuinely seeing stars in the night sky. With the rise of anti-science sentiment and anti-space exploration, our team strives to bring the cosmos to the home, creating an augmented immersive and educative experience that can ignite lifelong interests and inspire the next generation of future scientists that will change our world.</p>
+            <p class="text-lg">Motivated by the wizardry of Iron Man interacting with his virtual tech, we set out to use our machine learning/AI and full-stack development experiences to make this idea a reality.</p>
+        </div>
+        <div class="flex items-center">
+            <img src="{{ url_for('static', filename='images/to_the_moon.svg') }}" alt="To The Moon SVG" class="w-72 h-72 ml-20 mr-20">
+            <img src="{{ url_for('static', filename='images/counting_stars.svg') }}" alt="To The Moon SVG" class="w-72 h-72 ml-20 mr-20">
+            <img src="{{ url_for('static', filename='images/my_universe.svg') }}" alt="To The Moon SVG" class="w-72 h-72 ml-20 mr-20">
+        </div>
+    </div>
+    
 
-TODO ABOUT
+    <div data-aos="fade-up" class="p-6 rounded-lg flex items-center bg-gray-200">
+        <div class="flex-1 text-black space-y-4 pl-6 items-left m-10">
+            <h2 class="text-4xl font-semibold">On GRACE</h2>
+            <p class="text-lg">Using just a projector, a laptop, and a dark room, GRACE creates an engaging interactive star map. Participants can navigate the celestial expanse by simply moving their arm, employing a nifty flashlight that mimics a telescope which enables them to zoom in on specific stars and delve deeper into their characteristics.</p>
+            <p class="text-lg">[insert front end stuff]</p>
+            <p class="text-lg">We used computer vision to power our backend. We found the largest area with a significant luminosity over a certain threshold to detect our flashlight selecting stars. Using a TensorFlow Deep Neural Network and pose estimation, we detected waving arms, whose motion would be relayed to the star map to scroll through the night sky.</p>
+        </div>
+        <img src="{{ url_for('static', filename='images/animating.svg') }}" alt="Animating SVG" class="w-80 h-80 ml-6 mr-6">
+    </div>
+        
+    <div data-aos="fade-up" class="p-6 flex items-center">
+        <img src="{{ url_for('static', filename='images/multitasking.svg') }}" alt="To The Moon SVG" class="w-96 h-96 ml-6 mr-6">
+        <div class="flex-1 text-black space-y-4 pr-6 items-right m-10">
+            <h2 class="text-4xl font-semibold">Challenges</h2>
+            <p class="text-lg">One of the challenges that we ran into was finding a Pose Estimation model. We were unable to download the pose models from CMU’s open pose and had to settle for a less accurate one. Another challenge was integrating the computer vision into the web app and having the backend interact with the frontend. Calibrating the camera with the projector was extremely challenging in its own right, as we have to use an additional step to transform the projected image and flashlight pointer into information on our web app. Zooming into the stars and getting a snapshot was far harder than expected. Transforming the right angle and declination of the API to the azimuthal coordinate system of the stars used quite a bit of challenging math and physics.</p>
+        </div>
+    </div>
 
+    <div data-aos="fade-up" class="p-6 rounded-lg flex items-center bg-gray-200">
+        <div class="flex-1 text-black space-y-4 pr-6 items-right m-10">
+            <h2 class="text-4xl font-semibold">Major Accomplishments</h2>
+            <p class="text-lg">We’re really proud of undertaking this ambitious project and being able to successfully build an interactive star map that fulfilled our Tony Stark virtual tech aspirations.</p>
+        </div>
+        <img src="{{ url_for('static', filename='images/pair_programming.svg') }}" alt="To The Moon SVG" class="w-80 h-80 ml-6 mr-6">
+    </div>
+
+    <div data-aos="fade-up" class="p-6 flex items-center">
+        <img src="{{ url_for('static', filename='images/outer_space.svg') }}" alt="To The Moon SVG" class="w-64 h-64 ml-6 mr-6">
+        <div class="flex-1 text-black space-y-4 pr-6 items-right m-10">
+            <h2 class="text-4xl font-semibold">What we learned</h2>
+            <p class="text-lg">We learned a lot more than just new computer science methods. Beyond working with pose estimation and integrating the computer vision into the Flask application, we also learned a ton about astrophysics coordinate systems.</p>
+        </div>
+    </div>
+
+    <div data-aos="fade-up" class="p-6 rounded-lg flex items-center bg-gray-200">
+        <div class="flex-1 text-black space-y-4 pr-6 items-right m-10">
+            <h2 class="text-4xl font-semibold">What's next</h2>
+            <p class="text-lg">In the future, we plan to train a more robust pose estimation model, which would be better in detecting the limbs of the users. With this, we can account for more poses beyond just waving an arm to scroll through the night sky. We can implement more functionality such that you can push your arm outwards to zoom into the specific area of the night sky.</p>
+        </div>
+        <img src="{{ url_for('static', filename='images/schedule.svg') }}" alt="To The Moon SVG" class="w-64 h-64 ml-6 mr-6">
+    </div>
+
+    <div class="bg-black p-1 flex items-center">
+        <div class="flex justify-center items-center whitespace-nowrap">
+            <img src="../static/images/logo.svg" alt="logo" class="h-10 mr-2 ml-2">
+            <a href="/" class="text-purple-500 font-extrabold p-4 text-2xl ">GRACE</a> 
+        </div>
+        <div class="flex-1 text-white">
+            <h1 class="text-lg text-right">Anmay Gupta, Dashiell Bhattacharyya, Kevin Liu, Elvin Lo</h1>
+        </div>
+    </div>
 {% endblock %}
 
 
 {% block scripts %}
-<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
-<script src="{{ url_for('static', filename='js/projection.js') }}"></script>
-
-
-
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
+    <script src="{{ url_for('static', filename='js/projection.js') }}"></script>
+    <script src="https://cdn.rawgit.com/michalsnik/aos/2.1.1/dist/aos.js"></script>
+    <script>
+        AOS.init({
+            duration: 1200,
+        });
+    </script>
 {% endblock %}
+
