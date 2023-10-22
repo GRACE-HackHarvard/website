@@ -8,27 +8,61 @@ import time
 from io import BytesIO
 import numpy as np
 import ads_api
+from flask_session import Session
+from flask_cors import CORS
+import redis
 
 app = Flask(__name__)
+app.secret_key="anystringhere"
+
 
 app.config['SECRET_KEY'] = 'grace'
-socketio = SocketIO(app, cors_allowed_origins="*")
+app.secret_key="anystringhere"
+
+
+app.config.update(SECRET_KEY=os.urandom(24))
+app.config['SESSION_TYPE'] = 'filesystem'
+
+Session(app)
+app.config['SECRET_KEY'] = 'grace'
+app.secret_key="anystringhere"
+
+
+CORS(app)
+app.config['SECRET_KEY'] = 'grace'
+app.config['SECRET_KEY'] = 'grace'
+app.secret_key="anystringhere"
+
+
+app.config.update(SECRET_KEY=os.urandom(24))
+app.config['SECRET_KEY'] = 'grace'
+app.secret_key="anystringhere"
+
+
+
+socketio = SocketIO(app, cors_allowed_origins="*", manage_sessions=False)
+app.config['SECRET_KEY'] = 'grace'
+app.secret_key="anystringhere"
+Session().init_app(app)
+
+
 
 @socketio.on('calibration')
 def calibration_call(data):
     b64data = base64.b64decode(data["data"][23:])
     image = Image.open(BytesIO(b64data))
     suc, vals = calibrate_capture(np.array(image))
-    print(suc, vals)
     if not suc:
-        print("hold on!")
         emit("hold on!", {})
         return
-    if "vals" not in session:
-        session["vals_tmp"] = [[],[],[],[]]
-    session["vals_tmp"][data["id"]].append((B, G, R))
+    if "vals_tmp" not in session or session["vals_tmp"] == None:
+        session["vals_tmp"] = [[],[],[],[]]#(tuple([tuple()]), tuple([tuple()]), tuple([tuple()]), tuple([tuple()]))
+    session["vals_tmp"][data["id"] - 1].append(vals)
+    session["vals_tmp"][data["id"] - 1] = session["vals_tmp"][data["id"] - 1].copy()
+    session.modified = True
 
-@socketio.on('done_calibration')
+
+@socketio.on('done_calibration')    
 def complete_calibration(data):
     A, B, C, D = session["vals_tmp"]
     session["vals"] = (
@@ -36,16 +70,32 @@ def complete_calibration(data):
     (sum([a[0] for a in D])/len(A), sum([a[1] for a in D])/len(A)),
     (sum([a[0] for a in B])/len(A), sum([a[1] for a in B])/len(A))
         )
+    B, D, A = session["vals"]
+    try:
+        np.linalg.inv(np.array((sub(B, A), sub(D, A))))
+        emit("leave", {"vals":session["vals"]})
+    except: 
+        emit("die and cry", {})
+        reset_calibration()
+
+
+@app.route("/_store_session", methods=["POST"])
+def store_session():
+    session["vals"] = request.json["vals"]
+    return "god help me please"
 
 @socketio.on('reset_calibration')
-def complete_calibration(data):
+def reset_calibration(data):
     session.remove("vals_tmp")
     session.remove("vals")
 
 @socketio.on('lightcapture')
 def calibration_call(data):
-
-    if "vals" not in session:
+    if "vals" not in session or session["vals"] == None:
+        try:
+            print("Hello world!")
+        except Exception as e:
+            pass          
         emit("redirect_calibrate", {})
         return
 
@@ -56,11 +106,8 @@ def calibration_call(data):
 
     if not suc: return
 
-    print(session)
-    print(session["vals"])
-
     R, G, B = session["vals"]
-    newcoords = convert_coords((x, y), (sub(R, B), sub(G, B)))
+    newcoords = convert_coords(sub((x, y), B), (sub(R, B), sub(G, B)))
     emit("lightcoords", {"coords":newcoords})
 
 def sub(A, B):
@@ -72,18 +119,21 @@ def convert_coords(exact, vals):
 
     # vec_new = np.linalg.inv(np.column_stack((w1, w2, w3))).dot(vec_old)
 
-    return np.linalg.solve(mp.array(vals), np.array(exact)) 
+    return tuple(np.linalg.solve(np.array(vals), np.array(exact)))
 
 @app.route('/')
 def index():
+    session['x'] = 'y'
     return render_template('index.html')
 
 @app.route('/calibration')
 def calibrate():
-     return render_template("calibration.html")
+    session['x'] = 'y'
+    return render_template("calibration.html")
 
 @app.route('/map')
 def map_route():
+    session['x'] = 'y'
     return render_template("map.html")
 
 @app.route('/api/data', methods=['GET'])

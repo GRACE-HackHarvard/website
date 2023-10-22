@@ -47,7 +47,7 @@
 </style>
 </head>
 <body class="b1" id="b1">
-<p>
+<p id="text">
 	test
 </p>
 <video id="vidbox" class="vidbox" hidden width="1920" height="1080" controls>
@@ -79,7 +79,7 @@ addEventListener("click", function() {
 
 $(document).ready(function(){
  // sending a connect request to the server.
- var socket = io.connect('http://localhost:5000');
+ var socket = io.connect('http://localhost:5002');
 });
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -116,8 +116,16 @@ setInterval(function myFunction(){
 current_errors = 0;
 setInterval(function myFunction2() {
 	index++;
-	if (index==5) {window.location.replace("http://127.0.0.1:5000/map");
+	if (current_errors > 200) {
+		document.getElementById("text").innerHTML = "Failed to calibrate, trying again"
+		index = 1;
+		document.body.className = "b" + index;
+		socket.emit("reset_calibration")
+
+	}
+	if (index==5) {
 	socket.emit("done_calibration", {});
+
 	}
 	document.body.className = "b" + index;
 }, 1000);
@@ -125,6 +133,21 @@ setInterval(function myFunction2() {
 socket.on("hold on!", function myFunction3() {
 	current_errors++;
 })
+
+socket.on("leave", function myFunction4(data) {
+	$.ajax({
+		url: "http://127.0.0.1:5002/_store_session",
+		type:"POST",
+        data: JSON.stringify(data),
+        dataType:"json",
+        contentType:"application/json"
+	})
+	window.location.replace("http://127.0.0.1:5002/map");
+});
+
+socket.on("die and cry", function myFunction5(data) {
+	index = 0;
+});
 
 </script>
 </body>

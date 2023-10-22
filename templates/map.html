@@ -105,7 +105,6 @@
         // objects: shown_objects,
         callback: {
             'click': function(e){
-                console.log(e, radec2xy)
                 e.nearest = e.data.sky.nearestObject(e.x,e.y);
                 console.log(e.nearest);
                 changeIFRAME(e.nearest);
@@ -135,7 +134,7 @@
 
 $(document).ready(function(){
  // sending a connect request to the server.
- var socket = io.connect('http://localhost:5000');
+ var socket = io.connect('http://localhost:5002');
 });
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -166,11 +165,11 @@ setInterval(function myFunction(){
        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
       const imageData = canvas.toDataURL('image/jpeg');
     socket.emit("lightcapture", {data:imageData})
-}, 300);
+}, 300 );
 
 
 socket.on('redirect_calibrate', function(data) {
-  window.location.replace("http://127.0.0.1:5000/calibration");
+  window.location.replace("http://127.0.0.1:5002/calibration");
 });
 
 socket.on('lightcoords', function(data) {
