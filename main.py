@@ -7,12 +7,6 @@ from ai import detect_light_capture, calibrate_capture
 import time
 from io import BytesIO
 import numpy as np
-from dotenv import load_dotenv
-import os
-
-load_dotenv()
-
-API_KEY = os.getenv('ADS_API_KEY')
 
 app = Flask(__name__)
 
