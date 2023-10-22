@@ -4,10 +4,12 @@ import cv2
 from PIL import Image
 import base64
 from ai import detect_light_capture, calibrate_capture
+from transformers import PegasusForConditionalGeneration, PegasusTokenizer
 import time
 from io import BytesIO
 import numpy as np
 import ads_api
+from ads_api import summarize_texts
 import os
 from flask_session import Session
 from flask_cors import CORS
@@ -45,6 +47,12 @@ socketio = SocketIO(app, cors_allowed_origins="*", manage_sessions=False)
 app.config['SECRET_KEY'] = 'grace'
 app.secret_key="anystringhere"
 Session().init_app(app)
+
+
+model_name="google/pegasus-large"
+tokenizer = PegasusTokenizer.from_pretrained(model_name)
+model = PegasusForConditionalGeneration.from_pretrained(model_name)
+
 
 
 
@@ -145,7 +153,17 @@ def api_call():
     search_query = request.json
     titles = ads_api.search_for_papers(search_query)
     abstracts = ads_api.get_abstracts(titles)
+    print(abstracts)
     return jsonify({'titles': titles, 'abstracts': abstracts})
+
+@app.route('/_adsAIdata', methods=['POST'])
+def apiAI_call():
+    search_query = request.json
+    titles = ads_api.search_for_papers(search_query)
+    abstracts = ads_api.get_abstracts(titles)
+    print(abstracts)
+    summaries = summarize_texts(abstracts, tokenizer, model)
+    return jsonify({'titles': titles, 'abstracts': abstracts, 'summaries': summaries})
 
 if __name__ == '__main__':
     socketio.run(app, host='127.0.0.1', debug=True,port="5002")

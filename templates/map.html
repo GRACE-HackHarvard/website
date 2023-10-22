@@ -66,9 +66,12 @@
                     <p id="objectDEC" class="text-white text-l ml-10 mr-10"></p>
                     <br>
                     <p class="text-white text-xl font-bold ml-10 mr-10">Relevant Research:</p>
+                    <!-- <h3>Relevant Research</h3> -->
+                    <div id="abstractsContainer"></div> <!-- This is where abstracts will be displayed -->
+
                     <div class="flex justify-between mr-10">
                         <p id="research" class="text-white text-l ml-10 mr-10 text-ellipsis">None</p>
-                        <img src="../static/images/info.png" alt="Additional Info" class="h-6" onclick="alert('hello!')">
+                        <img src="../static/images/info.png" alt="Additional Info" class="h-6" onclick="runAIAbstractCall()">
                     </div>
                 </div>
                 <div class="flex justify-center items-center">
@@ -160,6 +163,7 @@
         document.getElementById('myIframe').src = src;
 
         var titleRequest = sendRequest(nearest.label);
+        console.log(titleRequest)
         titleRequest.done(function(data) {
             if(data.titles.titles.length != 0) {
                 document.getElementById('research').innerText = data.titles.titles[0];
@@ -167,6 +171,9 @@
                 document.getElementById('research').innerText = "No relevant research";
             }
         });
+
+        // Fetch and display abstract summaries for the current object.
+        displayAIAbstract(nearest.label);
     }  
 
 $(document).ready(function(){
@@ -227,8 +234,53 @@ function sendRequest(input) {
     });
 }
 
-function displayAIAbstract() {
-    return 0;
+function displayAIAbstract(objectName) {
+    // Make an Ajax call to get the abstract for the object
+    $.ajax({
+        url: "/_adsAIdata",
+        type: "POST",
+        data: JSON.stringify({ query: objectName }),
+        dataType: "json",
+        contentType: "application/json",
+        success: function(data) {
+            console.log("Summarized abstract:", data);
+
+            if (data.abstracts && data.abstracts.length > 0) {
+                $('#abstractsContainer').empty(); // Clear any previous abstracts
+
+                data.abstracts.forEach(function(abstractText) {
+                    // Send each abstract to get summarized
+                    $.ajax({
+                        url: "/summarize_abstract",
+                        type: "POST",
+                        data: JSON.stringify({ abstract: abstractText }),
+                        dataType: "json",
+                        contentType: "application/json",
+                        success: function(data) {
+                            console.log(data);
+                            var summarizedAbstract = data.summary;
+
+                            // Append the summarized abstract to the abstractsContainer
+                            $('#abstractsContainer').append('<p>' + summarizedAbstract + '</p>');
+                        },
+                        error: function(error) {
+                            console.error("Error summarizing the abstract: ", error);
+                        }
+                    });
+                });
+            } else {
+                console.log("No abstracts found for the object: ", objectName);
+            }
+        },
+        error: function(error) {
+            console.error("Error fetching the abstract: ", error);
+        }
+    });
 }
+
+function runAIAbstractCall() {
+    alert("hello!");
+}
+
 </script>
 {% endblock %}
