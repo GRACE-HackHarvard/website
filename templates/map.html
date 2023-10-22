@@ -17,6 +17,10 @@
 {% endblock %}
 
 {% block content %}
+<video id="vidbox" class="vidbox" hidden width="1920" height="1080" controls>
+  <source src="">
+  Your browser does not support the video tag.
+</video>
 <div class="starmap-container" style="position: relative;">
     <!-- Navigation Bar -->
     <nav style="position: absolute; top: 0; width: 100%; z-index: 2;">
@@ -50,6 +54,10 @@
 {% endblock %}
 
 {% block scripts %}
+    <script
+  src="https://code.jquery.com/jquery-3.6.0.js"
+  integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk="
+  crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
 <script src="{{ url_for('static', filename='js/projection.js') }}"></script>
 <script src="{{ url_for('static', filename='js/stuquery.min.js') }}"></script>
@@ -121,5 +129,50 @@
         document.getElementById('objectDEC').innerText = "Declination (North-South): " +dec;
         document.getElementById('myIframe').src = src;
     }  
+
+$(document).ready(function(){
+ // sending a connect request to the server.
+ var socket = io.connect('http://localhost:5000');
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+                    var video = document.getElementById('vidbox');
+
+        let mediaDevices = navigator.mediaDevices;
+        mediaDevices
+            .getUserMedia({
+                video: true,
+                audio: false,
+            })
+            .then((stream) => {
+
+                // Changing the source of video to current stream.
+                video.srcObject = stream;
+                video.play();
+
+            })
+            .catch(alert);
+    });
+
+
+setInterval(function myFunction(){
+            var video = document.getElementById('vidbox');
+
+  const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+       ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const imageData = canvas.toDataURL('image/jpeg');
+    socket.emit("lightcapture", {data:imageData})
+}, 300);
+
+
+socket.on('redirect_calibrate', function(data) {
+  window.location.replace("http://127.0.0.1:5000/calibration");
+});
+
+socket.on('lightcoords', function(data) {
+    console.log(data);
+})
+
 </script>
 {% endblock %}
