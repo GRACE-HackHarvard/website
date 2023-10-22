@@ -17,7 +17,6 @@ import redis
 load_dotenv()
 
 API_KEY = os.getenv('ADS_API_KEY')
-
 app = Flask(__name__)
 app.secret_key="anystringhere"
 
