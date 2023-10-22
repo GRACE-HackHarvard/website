@@ -54,8 +54,6 @@ tokenizer = PegasusTokenizer.from_pretrained(model_name)
 model = PegasusForConditionalGeneration.from_pretrained(model_name)
 
 
-
-
 @socketio.on('calibration')
 def calibration_call(data):
     b64data = base64.b64decode(data["data"][23:])
@@ -96,6 +94,8 @@ def reset_calibration(data):
     session.remove("vals_tmp")
     session.remove("vals")
 
+
+globalcoords = (0, 0)
 @socketio.on('lightcapture')
 def calibration_call(data):
     if "vals" not in session or session["vals"] == None:       
@@ -112,6 +112,7 @@ def calibration_call(data):
     R, G, B = session["vals"]
     newcoords = convert_coords((x, y), (R, G, B))
     print(newcoords)
+    globalcoords = newcoords
     emit("lightcoords", {"coords":newcoords})
 
 def sub(A, B):
