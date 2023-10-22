@@ -34,7 +34,7 @@
         <div class="flex-1 text-black space-y-4 pl-6 items-left m-10">
             <h2 class="text-4xl font-semibold">On GRACE</h2>
             <p class="text-lg">Using just a projector, a laptop, and a dark room, GRACE creates an engaging interactive star map. Participants can navigate the celestial expanse by simply moving their arm, employing a nifty flashlight that mimics a telescope which enables them to zoom in on specific stars and delve deeper into their characteristics.</p>
-            <p class="text-lg">[insert front end stuff]</p>
+            <p class="text-lg">Our front end was built in Jinja Tailwind... [insert front end stuff]</p>
             <p class="text-lg">We used computer vision to power our backend. We found the largest area with a significant luminosity over a certain threshold to detect our flashlight selecting stars. Using a TensorFlow Deep Neural Network and pose estimation, we detected waving arms, whose motion would be relayed to the star map to scroll through the night sky.</p>
         </div>
         <img src="{{ url_for('static', filename='images/animating.svg') }}" alt="Animating SVG" class="w-80 h-80 ml-6 mr-6">
@@ -59,14 +59,14 @@
     <div data-aos="fade-up" class="p-6 flex items-center">
         <img src="{{ url_for('static', filename='images/outer_space.svg') }}" alt="To The Moon SVG" class="w-64 h-64 ml-6 mr-6">
         <div class="flex-1 text-black space-y-4 pr-6 items-right m-10">
-            <h2 class="text-4xl font-semibold">What we learned</h2>
+            <h2 class="text-4xl font-semibold">What We Learned</h2>
             <p class="text-lg">We learned a lot more than just new computer science methods. Beyond working with pose estimation and integrating the computer vision into the Flask application, we also learned a ton about astrophysics coordinate systems.</p>
         </div>
     </div>
 
     <div data-aos="fade-up" class="p-6 rounded-lg flex items-center bg-gray-200">
         <div class="flex-1 text-black space-y-4 pr-6 items-right m-10">
-            <h2 class="text-4xl font-semibold">What's next</h2>
+            <h2 class="text-4xl font-semibold">The Future of GRACE</h2>
             <p class="text-lg">In the future, we plan to train a more robust pose estimation model, which would be better in detecting the limbs of the users. With this, we can account for more poses beyond just waving an arm to scroll through the night sky. We can implement more functionality such that you can push your arm outwards to zoom into the specific area of the night sky.</p>
         </div>
         <img src="{{ url_for('static', filename='images/schedule.svg') }}" alt="To The Moon SVG" class="w-64 h-64 ml-6 mr-6">
