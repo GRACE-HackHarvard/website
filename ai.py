@@ -56,7 +56,10 @@ if __name__ == "__main__":
     while True:
         ret, frame = cap.read()
         R, G, B = cv2.split(frame)
-        z = G*3 - R - B
+        z = G*3 - B - R
+        # threshold = 225 
+        # _, thresholded = cv2.threshold(z, threshold, 255, cv2.THRESH_BINARY)
+
         if not ret:
             print("cry and be sad")
             continue

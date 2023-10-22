@@ -54,8 +54,8 @@
 
     <!-- Star Map -->
     <div class="flex w-full">
-        <div id="starmap" style="width:100%;height:92vh;"></div>
-        <div style="background-color: black; height: 92vh;">
+        <div id="starmap" style="width:100%;height:92.99vh;"></div>
+        <div style="background-color: black; height: 92.99vh;">
             <iframe id="myIframe" src="http://server1.sky-map.org/skywindow?object=M100&zoom=8&img_source=SDSS" width=400 height=320>
             </iframe>
             
@@ -78,7 +78,7 @@
         </div>
     </div>
 
-    <span class="dot" id="dot" style="position: absolute;height: 25px;width: 25px;background-color: #bbb;border-radius: 50%;display: inline-block;top: 10vw; left: 10vw;"></span>
+    <span class="dot" id="dot" style="position: absolute;height: 12.5;width: 12.5;background-color: #bbb;border-radius: 50%;display: inline-block;top: 10vw; left: 10vw;"></span>
 
 {% endblock %}
 
@@ -144,6 +144,7 @@
 
     S(document).ready(function() {
         planetarium = S.virtualsky(input);
+        document.body.style.overflow = "hidden";
     });
     
     function changeIFRAME(nearest) {
@@ -153,7 +154,7 @@
         var src = "http://www.sky-map.org/skywindow?object=" 
                 + nearest.label.toLowerCase() + "&zoom=5" +
                 "&box_color=green&box_width=100&box_height=100&img_source=DSS2";
-        console.log(src)
+        //console.log(src)
         document.getElementById('objectName').innerText = nearest.label;
         document.getElementById('objectRA').innerText = "Right Ascension (East-West): " + ra;
         document.getElementById('objectDEC').innerText = "Declination (North-South): " +dec;
@@ -202,7 +203,7 @@ setInterval(function myFunction(){
        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
       const imageData = canvas.toDataURL('image/jpeg');
     socket.emit("lightcapture", {data:imageData})
-}, 50 );
+}, 15 );
 
 
 socket.on('redirect_calibrate', function(data) {
@@ -214,6 +215,26 @@ socket.on('lightcoords', function(data) {
 
     element.style.left = (data["coords"][0]*100) + "vw";
     element.style.top = (data["coords"][1]*100) + "vh";
+
+
+    const canvas = document.getElementById("starmap_inner");
+// const ctx = canvas.getContext("2d");
+
+//     ctx.beginPath();
+//     console.log(data["coords"][0] * window.innerWidth)
+// ctx.arc(data["coords"][0] * window.innerWidth, data["coords"][1] * window.innerHeight, 50, 0, 2 * Math.PI);
+// ctx.fill();
+
+     e1 = new MouseEvent("click", {
+      clientX: data["coords"][0] * window.innerWidth,
+      clientY: data["coords"][1] * window.innerHeight + 90,
+    });
+    // canvas.addEventListener("click", (e) => {
+    //   console.log(document.elementFromPoint(e.clientX, e.clientY));
+    // });
+
+    canvas.dispatchEvent(e1);
+
 
 })
 
