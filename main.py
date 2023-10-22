@@ -75,12 +75,7 @@ def complete_calibration(data):
     (sum([a[0] for a in B])/len(A), sum([a[1] for a in B])/len(A))
         )
     B, D, A = session["vals"]
-    try:
-        np.linalg.inv(np.array((sub(B, A), sub(D, A))))
-        emit("leave", {"vals":session["vals"]})
-    except: 
-        emit("die and cry", {})
-        reset_calibration()
+    emit("leave", {"vals":session["vals"]})
 
 
 @app.route("/_store_session", methods=["POST"])
@@ -107,20 +102,20 @@ def calibration_call(data):
     if not suc: return
 
     R, G, B = session["vals"]
-    newcoords = convert_coords(sub((x, y), B), (sub(R, B), sub(G, B)))
+    newcoords = convert_coords((x, y), (R, G, B))
     print(newcoords)
     emit("lightcoords", {"coords":newcoords})
 
 def sub(A, B):
     return (A[0] - B[0], A[1] - B[1])
 
-def convert_coords(exact, vals):
-    if "vals" not in session:
-        return None
-
+def convert_coords(vals, exact):
     # vec_new = np.linalg.inv(np.column_stack((w1, w2, w3))).dot(vec_old)
-
-    return tuple(np.linalg.solve(np.array(vals), np.array(exact)))
+    xs = [i[0] for i in exact]
+    ys = [i[1] for i in exact]
+    A = (min(xs), min(ys))
+    B = (max(xs), max(ys))
+    return ((vals[0] - A[0])/(B[0] - A[0]), (vals[1] - A[1])/(B[1] - A[1]))#tuple(np.linalg.solve(np.array(vals), np.array(exact)))
 
 @app.route('/')
 def index():
@@ -137,6 +132,9 @@ def map_route():
     session['x'] = 'y'
     return render_template("map.html")
 
+@app.route('/about')
+def about():
+    return render_template('about.html')
 # @app.route('/api/adsdata', methods=['GET'])
 # def get_data():
 #     # Your API logic here

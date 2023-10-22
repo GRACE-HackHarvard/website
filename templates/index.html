@@ -1,28 +1,85 @@
-
-{% extends "base.html" %}
-
 {% block head %}
-    <link href="{{ url_for('static', filename='css/home.css') }}" rel="stylesheet">
+  <head>
+    <meta charset="utf-8" />
+    <meta property="og:type" content="website">
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+
+    <title>GRACE</title>
+
+    <!-- css -->
+    <link href="{{ url_for('static', filename='dist/css/styles.css') }}" rel="stylesheet" />
+      <link rel="stylesheet" href="{{url_for('static',filename='dist/css/output.css')}}">
+      <link href="https://cdn.rawgit.com/michalsnik/aos/2.1.1/dist/aos.css" rel="stylesheet">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fjalla+One&display=swap" rel="stylesheet">
+  </head>
 {% endblock %}
-
-
 
 {% block content %}
+    <div class="starry-sky-container" style="position: relative;"></div>
+        <nav style="position: absolute; top: 0; width: 100%; z-index: 2;">
+            <div class="flex w-full justify-between items-center lg:px-4 md:px-3 sm:px-2 h-[7vh] bg-transparent">
+                <!-- Left side of the nav -->
+                <div class="flex justify-center items-center whitespace-nowrap">
+                    <img src="../static/images/logo.svg" alt="logo" class="h-10 mr-2 ml-2">
+                    <a href="/" class="text-purple-500 font-extrabold p-4 text-2xl ">GRACE</a> 
+                </div>
 
-<div class="bg-black w-full h-[85vh]">
-    <div class="flex items-center justify-center">
-        <img src="../static/logo.svg" alt="logo" class="h-[80vh] w-[80%] mr-2">
+                <!-- Right side of the nav -->
+                <div id="navleft" class="flex w-full justify-end items-center lg:px-4 md:px-3 sm:px-2 h-[7vh]">
+                    <a href="/" class="text-white font-extrabold p-4 text-xl">Home</a>
+                    <a href="/about" class="text-white font-extrabold p-4 text-xl">About</a>
+                    <a href="/map" class="text-white font-extrabold p-4 text-xl">Star Map</a>
+                </div>
+            </div>
+        </nav>
+
+        <div class="flex justify-center items-center whitespace-nowrap">
+            <img src="../static/images/bg-blue.png" alt="bg-blue" class="h-fit w-full">
+        </div>
     </div>
-</div>
 
+    <div class="bg-black w-full h-[93vh] bg-cover bg-center relative" style="background-image: url('../static/images/reach-for-the-stars.png');">
+        <div data-aos="fade-up" class="flex-1 text-white">
+            <br>
+            <br>
+            <h1 class="text-7xl text-center font-bold">Reach for the stars with GRACE.</h1>
+        </div>
+    </div>
+
+    <div class="bg-black p-20 flex items-center">
+        <div data-aos="fade-up" class="flex-1 text-white space-y-4 m-6">
+            <h1 class="text-7xl font-bold ml-2 text-center">Meet GRACE,</h1>
+            <p class="font-semibold text-3xl ml-2 text-center">a generative real-time astronomy and celestial experience.</p>
+            <br>
+            <div style="text-align:center">    
+                <a href="/map" class="text-purple-500 font-semibold text-3xl ml-2">Get started here.</a> 
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-black p-1 flex items-center">
+        <div class="flex justify-center items-center whitespace-nowrap">
+            <img src="../static/images/logo.svg" alt="logo" class="h-10 mr-2 ml-2">
+            <a href="/" class="text-purple-500 font-extrabold p-4 text-2xl ">GRACE</a> 
+        </div>
+        <div class="flex-1 text-white">
+            <h1 class="text-lg text-right">Anmay Gupta, Dashiell Bhattacharyya, Kevin Liu, Elvin Lo</h1>
+        </div>
+    </div>
 {% endblock %}
-
 
 {% block scripts %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
 <script src="{{ url_for('static', filename='js/projection.js') }}"></script>
-
-
-
-
+<script src="https://cdn.rawgit.com/michalsnik/aos/2.1.1/dist/aos.js"></script>
+    <script>
+        AOS.init({
+            duration: 1200,
+        });
+    </script>
 {% endblock %}
+
+

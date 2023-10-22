@@ -7,7 +7,7 @@
     <title>GRACE</title>
 
     <!-- css -->
-    <link href="{{ url_for('static', filename='css/styles.css') }}" rel="stylesheet" />
+    <link href="{{ url_for('static', filename='dist/css/styles.css') }}" rel="stylesheet" />
 	  <link rel="stylesheet" href="{{url_for('static',filename='dist/css/output.css')}}">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -17,42 +17,69 @@
 {% endblock %}
 
 {% block content %}
-<video id="vidbox" class="vidbox" hidden width="1920" height="1080" controls>
-  <source src="">
-  Your browser does not support the video tag.
-</video>
-<div class="starmap-container" style="position: relative;">
-    <!-- Navigation Bar -->
-    <nav style="position: absolute; top: 0; width: 100%; z-index: 2;">
-        <div class="flex w-full justify-between items-center lg:px-4 md:px-3 sm:px-2 h-[7vh] bg-transparent">
-            <div class="flex justify-center items-center whitespace-nowrap">
-                <img src="../static/logo.svg" alt="logo" class="h-10 mr-2">
-                <a href="/" class="text-purple-500 font-bold p-2 text-lg">GRACE</a> 
-            </div>
-            <div id="navleft" class="flex w-full justify-end items-center lg:px-4 md:px-3 sm:px-2 h-[7vh] bg-tranparent">
-                <a href="/" class="text-white font-bold p-2">Home</a>
-                <a href="/about" class="text-white p-2 font-bold">About</a>
-                <a href="/map" class="text-white p-2 font-bold">Star Map</a>
-            </div>
+
+<!-- <nav style="position: absolute; top: 0; width: 100%; z-index: 2;">
+    <div class="flex w-full justify-between items-center lg:px-4 md:px-3 sm:px-2 h-[7vh] bg-transparent">
+        <div class="flex justify-center items-center whitespace-nowrap">
+            <img src="../static/logo.svg" alt="logo" class="h-10 mr-2">
+            <a href="/" class="text-purple-500 font-bold p-2 text-lg">GRACE</a> 
         </div>
-    </nav>
-    
+        <div id="navleft" class="flex w-full justify-end items-center lg:px-4 md:px-3 sm:px-2 h-[7vh] bg-tranparent">
+            <a href="/" class="text-white font-bold p-2">Home</a>
+            <a href="/about" class="text-white p-2 font-bold">About</a>
+            <a href="/map" class="text-white p-2 font-bold">Star Map</a>
+        </div>
+    </div>
+</nav> -->
+
+<nav>
+    <div class="flex w-full justify-between items-center lg:px-4 md:px-3 sm:px-2 h-[7vh] bg-black">
+        <div class="flex justify-center items-center whitespace-nowrap">
+            <img src="../static/images/logo.svg" alt="logo" class="h-10 mr-2 ml-2">
+            <a href="/" class="text-purple-500 font-extrabold p-4 text-2xl">GRACE</a> 
+        </div>
+        <div id="navleft" class="flex w-full justify-end items-center lg:px-4 md:px-3 sm:px-2 h-[7vh] bg-black">
+            <a href="/" class="text-white font-extrabold p-4 text-xl">Home</a>
+            <a href="/about" class="text-white p-4 font-extrabold text-xl">About</a>
+            <a href="/map" class="text-white p-4 font-extrabold text-xl">Star Map</a>
+        </div>
+    </div>
+</nav>
+
+<div class="starmap-container" style="position: relative;">
+    <video id="vidbox" class="vidbox" hidden width="1920" height="1080" controls>
+        <source src="">
+        Your browser does not support the video tag.
+    </video>
+
     <!-- Star Map -->
-    <div class="flex w-full h-full">
-        <div id="starmap" style="width:100%;height:100vh;"></div>
-        <div>
+    <div class="flex w-full">
+        <div id="starmap" style="width:100%;height:93vh;"></div>
+        <div style="background-color: black; height: 93vh;">
             <iframe id="myIframe" src="http://server1.sky-map.org/skywindow?object=M100&zoom=8&img_source=SDSS" width=400 height=320>
             </iframe>
+<<<<<<< HEAD
             <div class="flex-col p-2 h-fit w-full bg-gray-400">
                 <p id="objectName" class="text-white font-bold">No Object Selected</p>
                 <p id="objectRA" class="text-white font-bold">Right Ascension (East-West): No Object Selected</p>
                 <p id="objectDEC" class="text-white font-bold">Declination (North-South): No Object Selected</p>
                 <p>Related Research</p>
                 <p id="research">No Object Selected</p>
+=======
+            
+            <div class="flex-col w-full">
+                <br><br><br><br>
+                <p id="objectName" class="text-white text-xl font-bold ml-10 mr-10">No object selected</p>
+                <br>
+                <p id="objectRA" class="text-white text-xl font-bold ml-10 mr-10">Right ascension (east-west): No object selected</p>
+                <br>
+                <p id="objectDEC" class="text-white text-xl font-bold ml-10 mr-10">Declination (north-south): No object selected</p>
+                <br><br><br>
+                <a href="/calibration" class="text-white text-xl font-bold ml-10 mr-10">See calibration here.</a>
+>>>>>>> 504a5c7b8d9f1488ba20c4a973cb71c99c9ee0e3
             </div>
         </div>
     </div>
-</div>
 {% endblock %}
 
 {% block scripts %}
@@ -175,7 +202,7 @@ setInterval(function myFunction(){
        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
       const imageData = canvas.toDataURL('image/jpeg');
     socket.emit("lightcapture", {data:imageData})
-}, 300 );
+}, 50 );
 
 
 socket.on('redirect_calibrate', function(data) {
