@@ -37,4 +37,4 @@ def get_abstracts(paper_stats):
     return abstract_array
 
 def get_abstracts_of_query(search_query):
-    return jsonify(get_abstracts(search_for_papers(search_query)))
+    return get_abstracts(search_for_papers(search_query))

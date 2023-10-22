@@ -8,6 +8,7 @@ import time
 from io import BytesIO
 import numpy as np
 import ads_api
+import os
 from flask_session import Session
 from flask_cors import CORS
 import redis
