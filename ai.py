@@ -52,18 +52,18 @@ def detect_light_capture(frame):
     # cap.release()
     # cv2.destroyAllWindows()
 
-cap = cv2.VideoCapture(0)
-if __name__ == "__main__":
-    while True:
-        ret, frame = cap.read()
-        if not ret:
-            print("cry and be sad")
-            continue
+# cap = cv2.VideoCapture(0)
+# if __name__ == "__main__":
+#     while True:
+#         ret, frame = cap.read()
+#         if not ret:
+#             print("cry and be sad")
+#             continue
 
-        fancy_stuff = calibrate_capture(frame)
-        if fancy_stuff[0] == False: continue
-        cv2.circle(frame, fancy_stuff[1], 10, (0, 255, 0), -1)
+#         fancy_stuff = calibrate_capture(frame)
+#         if fancy_stuff[0] == False: continue
+#         cv2.circle(frame, fancy_stuff[1], 10, (0, 255, 0), -1)
 
-        cv2.imshow("yay", frame)
-        if cv2.waitKey(30) == "z":
-            break
+#         cv2.imshow("yay", frame)
+#         if cv2.waitKey(30) == "z":
+#             break

@@ -58,35 +58,27 @@ def calibration_call(data):
     b64data = base64.b64decode(data["data"][23:])
     image = Image.open(BytesIO(b64data))
     suc, vals = calibrate_capture(np.array(image))
-    print(suc, vals)
     if not suc:
-        print("hold on!")
         emit("hold on!", {})
         return
-    print(session)
     if "vals_tmp" not in session or session["vals_tmp"] == None:
         session["vals_tmp"] = [[],[],[],[]]#(tuple([tuple()]), tuple([tuple()]), tuple([tuple()]), tuple([tuple()]))
     session["vals_tmp"][data["id"] - 1].append(vals)
     session["vals_tmp"][data["id"] - 1] = session["vals_tmp"][data["id"] - 1].copy()
     session.modified = True
 
-    print(session)
 
 @socketio.on('done_calibration')    
 def complete_calibration(data):
-    print("HELLO")
     A, B, C, D = session["vals_tmp"]
-    print("HELLO")
     session["vals"] = (
     (sum([a[0] for a in A])/len(A), sum([a[1] for a in A])/len(A)),
     (sum([a[0] for a in D])/len(A), sum([a[1] for a in D])/len(A)),
     (sum([a[0] for a in B])/len(A), sum([a[1] for a in B])/len(A))
         )
-    print(session["vals"])
     B, D, A = session["vals"]
     try:
         np.linalg.inv(np.array((sub(B, A), sub(D, A))))
-        print(type(session["vals"]), "BFSA")
         emit("leave", {"vals":session["vals"]})
     except: 
         emit("die and cry", {})
@@ -95,22 +87,18 @@ def complete_calibration(data):
 
 @app.route("/_store_session", methods=["POST"])
 def store_session():
-    print(request.json)
     session["vals"] = request.json["vals"]
     return "god help me please"
 
 @socketio.on('reset_calibration')
 def reset_calibration(data):
-    print("GOODBYE")
     session.remove("vals_tmp")
     session.remove("vals")
 
 @socketio.on('lightcapture')
 def calibration_call(data):
-    print(session, "ABALKDNF")
     if "vals" not in session or session["vals"] == None:
         try:
-            print(session["vals"])  
         except Exception as e:
             pass          
         emit("redirect_calibrate", {})
@@ -122,9 +110,6 @@ def calibration_call(data):
     suc, x, y = detect_light_capture(np.array(image))
 
     if not suc: return
-
-    print(session)
-    print(session["vals"])
 
     R, G, B = session["vals"]
     newcoords = convert_coords(sub((x, y), B), (sub(R, B), sub(G, B)))
