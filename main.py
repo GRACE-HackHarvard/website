@@ -1,4 +1,4 @@
-from flask import Flask, render_template, Response, jsonify, session
+from flask import Flask, render_template, Response, jsonify, session, request
 from flask_socketio import SocketIO, emit
 import cv2
 from PIL import Image
@@ -9,15 +9,49 @@ from io import BytesIO
 import numpy as np
 from dotenv import load_dotenv
 import os
+from flask_session import Session
+from flask_cors import CORS
+import redis
+
 
 load_dotenv()
 
 API_KEY = os.getenv('ADS_API_KEY')
 
 app = Flask(__name__)
+app.secret_key="anystringhere"
+
 
 app.config['SECRET_KEY'] = 'grace'
-socketio = SocketIO(app, cors_allowed_origins="*")
+app.secret_key="anystringhere"
+
+
+app.config.update(SECRET_KEY=os.urandom(24))
+app.config['SESSION_TYPE'] = 'filesystem'
+
+Session(app)
+app.config['SECRET_KEY'] = 'grace'
+app.secret_key="anystringhere"
+
+
+CORS(app)
+app.config['SECRET_KEY'] = 'grace'
+app.config['SECRET_KEY'] = 'grace'
+app.secret_key="anystringhere"
+
+
+app.config.update(SECRET_KEY=os.urandom(24))
+app.config['SECRET_KEY'] = 'grace'
+app.secret_key="anystringhere"
+
+
+
+socketio = SocketIO(app, cors_allowed_origins="*", manage_sessions=False)
+app.config['SECRET_KEY'] = 'grace'
+app.secret_key="anystringhere"
+Session().init_app(app)
+
+
 
 
 @socketio.on('calibration')
@@ -30,28 +64,56 @@ def calibration_call(data):
         print("hold on!")
         emit("hold on!", {})
         return
-    if "vals" not in session:
-        session["vals_tmp"] = [[],[],[],[]]
-    session["vals_tmp"][data["id"]].append((B, G, R))
+    print(session)
+    if "vals_tmp" not in session or session["vals_tmp"] == None:
+        session["vals_tmp"] = [[],[],[],[]]#(tuple([tuple()]), tuple([tuple()]), tuple([tuple()]), tuple([tuple()]))
+    session["vals_tmp"][data["id"] - 1].append(vals)
+    session["vals_tmp"][data["id"] - 1] = session["vals_tmp"][data["id"] - 1].copy()
+    session.modified = True
 
-@socketio.on('done_calibration')
+    print(session)
+
+@socketio.on('done_calibration')    
 def complete_calibration(data):
+    print("HELLO")
     A, B, C, D = session["vals_tmp"]
+    print("HELLO")
     session["vals"] = (
     (sum([a[0] for a in A])/len(A), sum([a[1] for a in A])/len(A)),
     (sum([a[0] for a in D])/len(A), sum([a[1] for a in D])/len(A)),
     (sum([a[0] for a in B])/len(A), sum([a[1] for a in B])/len(A))
         )
+    print(session["vals"])
+    B, D, A = session["vals"]
+    try:
+        np.linalg.inv(np.array((sub(B, A), sub(D, A))))
+        print(type(session["vals"]), "BFSA")
+        emit("leave", {"vals":session["vals"]})
+    except: 
+        emit("die and cry", {})
+        reset_calibration()
+
+
+@app.route("/_store_session", methods=["POST"])
+def store_session():
+    print(request.json)
+    session["vals"] = request.json["vals"]
+    return "god help me please"
 
 @socketio.on('reset_calibration')
-def complete_calibration(data):
+def reset_calibration(data):
+    print("GOODBYE")
     session.remove("vals_tmp")
     session.remove("vals")
 
 @socketio.on('lightcapture')
 def calibration_call(data):
-
-    if "vals" not in session:
+    print(session, "ABALKDNF")
+    if "vals" not in session or session["vals"] == None:
+        try:
+            print(session["vals"])  
+        except Exception as e:
+            pass          
         emit("redirect_calibrate", {})
         return
 
@@ -66,7 +128,7 @@ def calibration_call(data):
     print(session["vals"])
 
     R, G, B = session["vals"]
-    newcoords = convert_coords((x, y), (sub(R, B), sub(G, B)))
+    newcoords = convert_coords(sub((x, y), B), (sub(R, B), sub(G, B)))
     emit("lightcoords", {"coords":newcoords})
 
 def sub(A, B):
@@ -78,18 +140,21 @@ def convert_coords(exact, vals):
 
     # vec_new = np.linalg.inv(np.column_stack((w1, w2, w3))).dot(vec_old)
 
-    return np.linalg.solve(mp.array(vals), np.array(exact)) 
+    return tuple(np.linalg.solve(np.array(vals), np.array(exact)))
 
 @app.route('/')
 def index():
+    session['x'] = 'y'
     return render_template('index.html')
 
 @app.route('/calibration')
 def calibrate():
-     return render_template("calibration.html")
+    session['x'] = 'y'
+    return render_template("calibration.html")
 
 @app.route('/map')
 def map_route():
+    session['x'] = 'y'
     return render_template("map.html")
 
 
