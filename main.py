@@ -63,6 +63,9 @@ def calibration_call(data):
         return
     if "vals_tmp" not in session or session["vals_tmp"] == None:
         session["vals_tmp"] = [[],[],[],[]]#(tuple([tuple()]), tuple([tuple()]), tuple([tuple()]), tuple([tuple()]))
+    if data["id"] - 1 >= 4:
+        emit("hold on!", {})
+        return 
     session["vals_tmp"][data["id"] - 1].append(vals)
     session["vals_tmp"][data["id"] - 1] = session["vals_tmp"][data["id"] - 1].copy()
     session.modified = True
@@ -97,11 +100,8 @@ def reset_calibration(data):
 
 @socketio.on('lightcapture')
 def calibration_call(data):
-    if "vals" not in session or session["vals"] == None:
-        try:
-        except Exception as e:
-            pass          
-        emit("redirect_calibrate", {})
+    if "vals" not in session or session["vals"] == None:       
+        # emit("redirect_calibrate", {})
         return
 
 
@@ -113,6 +113,7 @@ def calibration_call(data):
 
     R, G, B = session["vals"]
     newcoords = convert_coords(sub((x, y), B), (sub(R, B), sub(G, B)))
+    print(newcoords)
     emit("lightcoords", {"coords":newcoords})
 
 def sub(A, B):
