@@ -7,12 +7,12 @@ from ai import detect_light_capture, calibrate_capture
 import time
 from io import BytesIO
 import numpy as np
+import ads_api
 
 app = Flask(__name__)
 
 app.config['SECRET_KEY'] = 'grace'
 socketio = SocketIO(app, cors_allowed_origins="*")
-
 
 @socketio.on('calibration')
 def calibration_call(data):
@@ -86,6 +86,10 @@ def calibrate():
 def map_route():
     return render_template("map.html")
 
+@app.route('/api/data', methods=['GET'])
+def get_data():
+    # Your API logic here
+    return jsonify(ads_api.get_abstracts_of_query())
 
 if __name__ == '__main__':
     socketio.run(app, host='127.0.0.1', debug=True,port="5002")
