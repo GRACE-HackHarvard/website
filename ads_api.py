@@ -38,5 +38,21 @@ def get_abstracts(paper_stats):
     return []
 
 def get_abstracts_of_query(search_query):
-    paper_stats = search_for_papers(search_query);
+    paper_stats = search_for_papers(search_query)
     return {"abstracts": get_abstracts(paper_stats)}
+
+def summarize_texts(texts, tokenizer, model):
+    summaries = []
+    for text in texts:
+        inputs = tokenizer.encode(text, return_tensors="pt", truncation=True, max_length=1024)
+        summary_ids = model.generate(inputs, max_length=150, num_beams=4, length_penalty=2.0, early_stopping=True)
+        summary = tokenizer.decode(summary_ids[0], skip_special_tokens=True)
+        summaries.append(summary)
+        return summaries # just take the first summary
+    return summaries
+
+# def get_abstract_summaries_of_query(search_query, tokenizer, model):
+#     abstracts_data = get_abstracts_of_query(search_query)
+#     abstracts = abstracts_data["abstracts"]
+#     summaries = summarize_texts(texts, tokenizer, model)
+#     return {"abstract_summaries": summaries}
