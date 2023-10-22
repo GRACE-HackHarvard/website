@@ -7,7 +7,12 @@ from ai import detect_light_capture, calibrate_capture
 import time
 from io import BytesIO
 import numpy as np
+from dotenv import load_dotenv
+import os
 
+load_dotenv()
+
+API_KEY = os.getenv('ADS_API_KEY')
 
 app = Flask(__name__)
 
@@ -89,4 +94,4 @@ def map_route():
 
 
 if __name__ == '__main__':
-    socketio.run(app, host='127.0.0.1', debug=True,port="5000")
+    socketio.run(app, host='127.0.0.1', debug=True,port="5002")

@@ -105,6 +105,7 @@
         // objects: shown_objects,
         callback: {
             'click': function(e){
+                console.log(e, radec2xy)
                 e.nearest = e.data.sky.nearestObject(e.x,e.y);
                 console.log(e.nearest);
                 changeIFRAME(e.nearest);
