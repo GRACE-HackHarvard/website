@@ -7,7 +7,7 @@ import json
 
 load_dotenv()
 API_KEY = os.getenv('ADS_API_KEY')
-ads.config.token = API_KEY
+ads.config.token = "ej3lm4nBdAJ0t9NYJnRGOMaF92fIuo1q7g3d6r5N"
 r = ads.RateLimits('SearchQuery')
 
 def search_for_papers(search_query):
