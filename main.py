@@ -142,6 +142,9 @@ def map_route():
     session['x'] = 'y'
     return render_template("map.html")
 
+@app.route('/about')
+def about():
+    return render_template('about.html')
 
 if __name__ == '__main__':
     socketio.run(app, host='127.0.0.1', debug=True,port="5002")
