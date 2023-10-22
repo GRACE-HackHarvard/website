@@ -3,6 +3,11 @@ from flask_socketio import SocketIO
 import cv2
 from ai import detect_light_capture
 import time
+from dotenv import load_dotenv
+
+load_dotenv()
+
+API_KEY = os.environ.get('ADS_API_KEY')
 
 app = Flask(__name__)
 
