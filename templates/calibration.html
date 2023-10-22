@@ -128,7 +128,7 @@ setInterval(function myFunction2() {
 
 	}
 	document.body.className = "b" + index;
-}, 1000);
+}, 5000);
 
 socket.on("hold on!", function myFunction3() {
 	current_errors++;
@@ -148,6 +148,14 @@ socket.on("leave", function myFunction4(data) {
 socket.on("die and cry", function myFunction5(data) {
 	index = 0;
 });
+
+socket.on("success", function myFunction6(data) {
+	var element = document.getElementById("dot");
+
+    element.style.left = (data["coords"][0]*100) + "vw";
+    element.style.top = (data["coords"][1]*100) + "vh";
+
+})
 
 </script>
 </body>

@@ -6,7 +6,7 @@ def calibrate_capture(frame):
     R, G, B = cv2.split(frame)
 
     threshold = 150 
-    _, thresholded = cv2.threshold(R, threshold, 255, cv2.THRESH_BINARY)
+    _, thresholded = cv2.threshold(G*3 - R - B, threshold, 255, cv2.THRESH_BINARY)
 
     contours, _ = cv2.findContours(thresholded, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
@@ -55,14 +55,16 @@ cap = cv2.VideoCapture(0)
 if __name__ == "__main__":
     while True:
         ret, frame = cap.read()
+        R, G, B = cv2.split(frame)
+        z = G*3 - R - B
         if not ret:
             print("cry and be sad")
             continue
 
         fancy_stuff = calibrate_capture(frame)
         if fancy_stuff[0] == False: continue
-        cv2.circle(frame, fancy_stuff[1], 10, (0, 255, 0), -1)
+        cv2.circle(z, fancy_stuff[1], 10, (0, 255, 0), -1)
 
-        cv2.imshow("yay", frame)
+        cv2.imshow("yay", z)
         if cv2.waitKey(30) == "z":
             break

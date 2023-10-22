@@ -75,6 +75,9 @@
             </div>
         </div>
     </div>
+
+    <span class="dot" id="dot" style="position: absolute;height: 25px;width: 25px;background-color: #bbb;border-radius: 50%;display: inline-block;top: 10vw; left: 10vw;"></span>
+
 {% endblock %}
 
 {% block scripts %}
@@ -195,8 +198,13 @@ socket.on('redirect_calibrate', function(data) {
 });
 
 socket.on('lightcoords', function(data) {
-    console.log(data);
+    var element = document.getElementById("dot");
+
+    element.style.left = (data["coords"][0]*100) + "vw";
+    element.style.top = (data["coords"][1]*100) + "vh";
+
 })
+
 
 
 
