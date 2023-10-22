@@ -1,4 +1,4 @@
-from flask import Flask, render_template, Response, jsonify, session
+from flask import Flask, render_template, Response, jsonify, session, request
 from flask_socketio import SocketIO, emit
 import cv2
 from PIL import Image
@@ -90,6 +90,15 @@ def map_route():
 def get_data():
     # Your API logic here
     return jsonify(ads_api.get_abstracts_of_query())
+
+@app.route('/api_call', methods=['POST'])
+def api_call():
+    data = request.get_json()
+    search_query = data.get('search_query')
+    # Process the user_input and make an API call if needed
+    # Replace this with your API call logic
+    api_response = f"API response for {search_query}"
+    return jsonify({'api_response': api_response})
 
 if __name__ == '__main__':
     socketio.run(app, host='127.0.0.1', debug=True,port="5002")

@@ -129,6 +129,8 @@
         document.getElementById('objectRA').innerText = "Right Ascension (East-West): " + ra;
         document.getElementById('objectDEC').innerText = "Declination (North-South): " +dec;
         document.getElementById('myIframe').src = src;
+
+        sendRequest(nearest.label);
     }  
 
 $(document).ready(function(){
@@ -175,5 +177,20 @@ socket.on('lightcoords', function(data) {
     console.log(data);
 })
 
+function sendRequest(input){
+    fetch('/api/data', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ string_query: input })
+        })
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('api_response').textContent = data.api_response;
+        });
+
+    console.log(response);
+}
 </script>
 {% endblock %}
