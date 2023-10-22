@@ -1,13 +1,13 @@
 function setLatitude(l){
-	outlatitude = {'deg':parseFloat(l),'rad':inrangeEl(parseFloat(l)*this.d2r)};
+	outlatitude = {'deg':parseFloat(l),'rad':inrangeEl(parseFloat(l)*d2r)};
 	return outlatitude;
 };
 
 function setLongitude(l){
-    outlongitude = {'deg':parseFloat(l),'rad':parseFloat(l)*this.d2r};
+    outlongitude = {'deg':parseFloat(l),'rad':parseFloat(l)*d2r};
 	while(outlongitude.rad <= -Math.PI) outlongitude.rad += 2*Math.PI;
 	while(outlongitude.rad > Math.PI) outlongitude.rad -= 2*Math.PI;
-	return this;
+	return outlongitude;
 }
 
 // Input variables! Including a latitude and longitude, using the clock as our date
@@ -76,6 +76,88 @@ function azel2xy(az,el,w,h){
     var k = 2/(1+sinel1*sinel+cosel1*cosel*cosaz);
     return {x:(w/2+f*k*h*cosel*sinaz),y:(h-f*k*h*(cosel1*sinel-sinel1*cosel*cosaz)),el:el};
 }
+
+function horizon2coord(coords){
+	// Return angle in [0, 2 * PI[
+	function Map2PI(angle){
+		var n;
+		var pipi = Math.PI * 2;
+		if(angle < 0.0){
+			n = Math.floor(angle / pipi);
+			return (angle - n * pipi);
+		}else if (angle >= pipi){
+			n = Math.floor(angle / pipi);
+			return (angle - n * pipi);
+		}else  return (angle);
+	}
+
+    // Return angle in [-PI, PI[
+	function MapPI(angle) {
+		var angle2PI = Map2PI(angle);
+		if(angle2PI >= Math.PI) return (angle2PI - 2 * Math.PI);
+		else return (angle2PI);
+	}
+
+	function convertAltAzToALTAZ3D(i){
+		var x = Math.sin(i.alt);
+		const cs = Math.cos(i.alt);
+		var z = cs * Math.cos(i.az);
+		var y = cs * Math.sin(i.az);
+		return [x, y, z];
+	}
+
+	function rotate(xyz/*: number[]*/, axis/*: RotationDefinition*/, angle/*:number*/){
+		const axes = [[1,2],[0,2],[0,1]];
+		const a = axes[axis.id][0];
+		const b = axes[axis.id][1];
+		const cos = Math.cos(angle);
+		const sin = Math.sin(angle);
+		const ret = JSON.parse(JSON.stringify(xyz));	// Minify can't cope with ... notation
+
+		ret[a] = xyz[a] * cos - xyz[b] * sin;
+		ret[b] = xyz[b] * cos + xyz[a] * sin;
+
+		return ret;
+	}
+
+	function convertALTAZ3DToAltAz(xyz){
+		return {'alt':MapPI(Math.asin(xyz[0])),'az':Map2PI(Math.atan2(xyz[1], xyz[2]))};
+	}
+	const xyz = convertAltAzToALTAZ3D({az: coords[1], alt: coords[0]});
+	const rotated = rotate(xyz, {id: 1}, Math.PI/2 + latitude.rad);
+	const res = convertALTAZ3DToAltAz(rotated);
+
+	return {ra: MapPI(res.az) + (Math.PI*times.LST/12), dec: -res.alt};
+}
+
+function xy2azel(x, y, w, h) {
+    var f = 0.42;
+    var sinel1 = 0;
+    var cosel1 = 1;
+    var X = (x - w/2) / h;
+    var Y = (h - y)/h;
+    var R = f;
+
+    var P = Math.sqrt(X * X + Y * Y);
+    var c = 2 * Math.atan2(P, 2*R);
+
+    var el = Math.asin(Math.cos(c)*sinel1 + Y * Math.sin(c) * cosel1 / P);
+    var az = Math.PI + Math.atan2(X * Math.sin(c), P * cosel1 * Math.cos(c) - Y * sinel1 * Math.sin(c));
+
+    return [az, el];
+}
+
+function xy2radec(x, y){
+	var azel = xy2azel(x, y, wide, tall);
+	if (azel === undefined) {
+		return undefined;
+	}
+
+	var coords = [azel[1], azel[0] + (az_off*d2r)];
+
+	return horizon2coord(coords);
+} 
+
 
 // Run this function on the last 2 values of each item in fullstars.json to obtain our final value
 function radec2xy(ra,dec){
