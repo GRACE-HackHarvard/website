@@ -5,34 +5,22 @@ import matplotlib.pyplot as plt
 def calibrate_capture(frame):
     #print(frame)
 
-    B, G, R = cv2.split(frame)
+    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-    l = [R, G, B]
-    colors = [(255, 0, 0), (0, 255, 0), (0, 0, 255)]
 
     threshold = 150
 
-    thresholded = (cv2.threshold(i, threshold, 255, cv2.THRESH_BINARY)[1] for i in l)
-    contours = [cv2.findContours(i, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)[0] for i in thresholded]
+    thresholded = cv2.threshold(frame, threshold, 255, cv2.THRESH_BINARY)[1]
+    contours = cv2.findContours(frame, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)[0]
 
-    if all(len(x) > 0 for x in contours):
-        max_contours = [max(i, key=cv2.contourArea) for i in contours]
+    if contours:
+        max_contours = max(frame, key=cv2.contourArea)
 
-        l = []
-        for cur in max_contours:
-            moments = cv2.moments(cur)
-            cx = int(moments["m10"] / moments["m00"]) if moments["m00"] else 0
-            cy = int(moments["m01"] / moments["m00"]) if moments["m00"] else 0
-            l.append((cx, cy))
-            # cv2.circle(frame, (cx, cy), 10, (0, 255, 0), -1)
+        moments = cv2.moments(max_contours)
+        cx = int(moments["m10"] / moments["m00"]) if moments["m00"] else 0
+        cy = int(moments["m01"] / moments["m00"]) if moments["m00"] else 0
 
-        for i in range(3):
-            cv2.circle(frame, l[i], 10, colors[i], -1)
-        
-        cv2.imshow("redyay", frame)
-        cv2.waitKey(33)
-
-        return True, l
+        return True, (cx, cy)
 
     return False, None
     #cv2.imshow("yay", _)

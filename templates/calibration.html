@@ -3,11 +3,28 @@
 <html lang="en">
 <head>
 <style>
-    body {
-	  background-image: url('{{ url_for('static', filename='calibration.png') }}');
+    .b1 {
+	  background-image: url('{{ url_for('static', filename='calibration1.png') }}');
 	background-size: 100% 100%;
 	overflow: hidden
+	}
 
+	.b2 {
+	  background-image: url('{{ url_for('static', filename='calibration2.png') }}');
+	background-size: 100% 100%;
+	overflow: hidden
+	}
+
+	.b3 {
+	  background-image: url('{{ url_for('static', filename='calibration3.png') }}');
+	background-size: 100% 100%;
+	overflow: hidden
+	}
+
+	.b4 {
+	  background-image: url('{{ url_for('static', filename='calibration4.png') }}');
+	background-size: 100% 100%;
+	overflow: hidden
 	}
 
 	p {
@@ -29,7 +46,7 @@
 
 </style>
 </head>
-<body>
+<body class="b1" id="b1">
 <p>
 	test
 </p>
@@ -85,6 +102,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
 
+var index = 1;
 setInterval(function myFunction(){
 			var video = document.getElementById('vidbox');
 
@@ -92,9 +110,21 @@ setInterval(function myFunction(){
 	  const ctx = canvas.getContext('2d');
 	   ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 	  const imageData = canvas.toDataURL('image/jpeg');
-	socket.emit("calibration", {data:imageData})
+	socket.emit("calibration", {data:imageData, id:index})
 }, 50);
 
+current_errors = 0;
+setInterval(function myFunction2() {
+	index++;
+	if (index==5) {window.location.replace("http://127.0.0.1:5000/map");
+	socket.emit("done_calibration", {});
+	}
+	document.body.className = "b" + index;
+}, 1000);
+
+socket.on("hold on!", function myFunction3() {
+	current_errors++;
+})
 
 </script>
 </body>

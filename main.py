@@ -20,9 +20,27 @@ def calibration_call(data):
     image = Image.open(BytesIO(b64data))
     suc, vals = calibrate_capture(np.array(image))
     print(suc, vals)
-    if not suc: return
-    R, G, B = vals
-    session["vals"] = (B, G, R)
+    if not suc:
+        print("hold on!")
+        emit("hold on!", {})
+        return
+    if "vals" not in session:
+        session["vals_tmp"] = [[],[],[],[]]
+    session["vals_tmp"][data["id"]].append((B, G, R))
+
+@socketio.on('done_calibration')
+def complete_calibration(data):
+    A, B, C, D = session["vals_tmp"]
+    session["vals"] = (
+    (sum([a[0] for a in A])/len(A), sum([a[1] for a in A])/len(A)),
+    (sum([a[0] for a in D])/len(A), sum([a[1] for a in D])/len(A)),
+    (sum([a[0] for a in B])/len(A), sum([a[1] for a in B])/len(A))
+        )
+
+@socketio.on('reset_calibration')
+def complete_calibration(data):
+    session.remove("vals_tmp")
+    session.remove("vals")
 
 @socketio.on('lightcapture')
 def calibration_call(data):
@@ -31,7 +49,7 @@ def calibration_call(data):
         emit("redirect_calibrate", {})
         return
 
-    
+
     b64data = base64.b64decode(data["data"][23:])
     image = Image.open(BytesIO(b64data))
     suc, x, y = detect_light_capture(np.array(image))
