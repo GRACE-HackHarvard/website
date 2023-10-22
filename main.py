@@ -7,16 +7,12 @@ from ai import detect_light_capture, calibrate_capture
 import time
 from io import BytesIO
 import numpy as np
-from dotenv import load_dotenv
+import ads_api
 import os
 from flask_session import Session
 from flask_cors import CORS
 import redis
 
-
-load_dotenv()
-
-API_KEY = os.getenv('ADS_API_KEY')
 app = Flask(__name__)
 app.secret_key="anystringhere"
 
@@ -49,7 +45,6 @@ socketio = SocketIO(app, cors_allowed_origins="*", manage_sessions=False)
 app.config['SECRET_KEY'] = 'grace'
 app.secret_key="anystringhere"
 Session().init_app(app)
-
 
 
 
@@ -137,6 +132,20 @@ def map_route():
     session['x'] = 'y'
     return render_template("map.html")
 
+@app.route('/about')
+def about():
+    return render_template('about.html')
+# @app.route('/api/adsdata', methods=['GET'])
+# def get_data():
+#     # Your API logic here
+#     return jsonify(ads_api.get_abstracts_of_query())
+
+@app.route('/_adsdata', methods=['POST'])
+def api_call():
+    search_query = request.json
+    titles = ads_api.search_for_papers(search_query)
+    abstracts = ads_api.get_abstracts(titles)
+    return jsonify({'titles': titles, 'abstracts': abstracts})
 
 if __name__ == '__main__':
     socketio.run(app, host='127.0.0.1', debug=True,port="5002")

@@ -34,15 +34,15 @@
 
 <nav>
     <div class="flex w-full justify-between items-center lg:px-4 md:px-3 sm:px-2 h-[7vh] bg-black">
-      <div class="flex justify-center items-center whitespace-nowrap">
-        <img src="../static/images/logo.svg" alt="logo" class="h-10 mr-2 ml-2">
-        <a href="/" class="text-purple-500 font-extrabold p-4 text-2xl">GRACE</a> 
-      </div>
-      <div id="navleft" class="flex w-full justify-end items-center lg:px-4 md:px-3 sm:px-2 h-[7vh] bg-black">
-          <a href="/" class="text-white font-extrabold p-4 text-xl">Home</a>
-          <a href="/about" class="text-white p-4 font-extrabold text-xl">About</a>
-          <a href="/map" class="text-white p-4 font-extrabold text-xl">Star Map</a>
-      </div>
+        <div class="flex justify-center items-center whitespace-nowrap">
+            <img src="../static/images/logo.svg" alt="logo" class="h-10 mr-2 ml-2">
+            <a href="/" class="text-purple-500 font-extrabold p-4 text-2xl">GRACE</a> 
+        </div>
+        <div id="navleft" class="flex w-full justify-end items-center lg:px-4 md:px-3 sm:px-2 h-[7vh] bg-black">
+            <a href="/" class="text-white font-extrabold p-4 text-xl">Home</a>
+            <a href="/about" class="text-white p-4 font-extrabold text-xl">About</a>
+            <a href="/map" class="text-white p-4 font-extrabold text-xl">Star Map</a>
+        </div>
     </div>
 </nav>
 
@@ -53,25 +53,27 @@
     </video>
 
     <!-- Star Map -->
-    <div class="flex w-full h-full">
-        <div id="starmap" style="width:100%;height:100vh;"></div>
-        <div>
+    <div class="flex w-full">
+        <div id="starmap" style="width:100%;height:92vh;"></div>
+        <div style="background-color: black; height: 92vh;">
             <iframe id="myIframe" src="http://server1.sky-map.org/skywindow?object=M100&zoom=8&img_source=SDSS" width=400 height=320>
             </iframe>
             
-            <div class="flex-col bg-black h-fit w-full">
-                <br><br><br>
-                <p id="objectName" class="text-white text-xl font-bold ml-10 mr-10">No Object Selected</p>
-                <br>
-                <p id="objectRA" class="text-white text-xl font-bold ml-10 mr-10">Right Ascension (East-West): No Object Selected</p>
-                <br>
-                <p id="objectDEC" class="text-white text-xl font-bold ml-10 mr-10">Declination (North-South): No Object Selected</p>
-                <br>
-            </div>
-
-            <div class="flex-col bg-black h-full w-full">
-                <br><br><br>
-                <a href="/calibration" class="text-white text-xl font-bold ml-10 mr-10">See calibration here.</a>
+            <div class="flex-col w-full items-stretch">
+                <div>
+                    <p id="objectName" class="text-white text-xl font-bold ml-10 mr-10">No object selected</p>
+                    <p id="objectRA" class="text-white text-l ml-10 mr-10"></p>
+                    <p id="objectDEC" class="text-white text-l ml-10 mr-10"></p>
+                    <br>
+                    <p class="text-white text-xl font-bold ml-10 mr-10">Relevant Research:</p>
+                    <div class="flex justify-between mr-10">
+                        <p id="research" class="text-white text-l ml-10 mr-10 text-ellipsis">None</p>
+                        <img src="../static/images/info.png" alt="Additional Info" class="h-6" onclick="alert('hello!')">
+                    </div>
+                </div>
+                <div class="flex justify-center items-center">
+                    <a href="/calibration" class="bg-gray-500 p-2 rounded-lg text-white text-l ml-10 mr-10">Presentation Mode</a>
+                </div>
             </div>
         </div>
     </div>
@@ -89,6 +91,7 @@
 <script src="{{ url_for('static', filename='js/projection.js') }}"></script>
 <script src="{{ url_for('static', filename='js/stuquery.min.js') }}"></script>
 <script src="{{ url_for('static', filename='js/virtualsky.min.js') }}"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     function decToDMS(decimal, form) {
       // Get the degrees
@@ -155,6 +158,15 @@
         document.getElementById('objectRA').innerText = "Right Ascension (East-West): " + ra;
         document.getElementById('objectDEC').innerText = "Declination (North-South): " +dec;
         document.getElementById('myIframe').src = src;
+
+        var titleRequest = sendRequest(nearest.label);
+        titleRequest.done(function(data) {
+            if(data.titles.titles.length != 0) {
+                document.getElementById('research').innerText = data.titles.titles[0];
+            } else {
+                document.getElementById('research').innerText = "No relevant research";
+            }
+        });
     }  
 
 $(document).ready(function(){
@@ -205,8 +217,18 @@ socket.on('lightcoords', function(data) {
 
 })
 
+function sendRequest(input) {
+    return $.ajax({
+        url:"/_adsdata",
+        type:"POST",
+        data: JSON.stringify(input),
+        dataType:"json",
+        contentType:"application/json"
+    });
+}
 
-
-
+function displayAIAbstract() {
+    return 0;
+}
 </script>
 {% endblock %}
