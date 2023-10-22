@@ -25,16 +25,18 @@ def get_abstracts(paper_stats):
     payload = {'bibcode': paper_stats["bibcodes"],
                'format': custom_format}
 
-    # the json library offers an easy way to convert between JSON or dictionaries and their serialized strings
-    serialized_payload = json.dumps(payload)
-
-    results = requests.post("https://api.adsabs.harvard.edu/v1/export/custom", 
-                            headers={'Authorization': 'Bearer ' + API_KEY},
-                            data=serialized_payload)
-    abstract_strings = results.json()['export']
-    abstract_array = abstract_strings.split("\n")
-    abstract_array = list(filter(None, abstract_array))
-    return abstract_array
+    if payload["bibcode"] != [] : 
+        # the json library offers an easy way to convert between JSON or dictionaries and their serialized strings
+        serialized_payload = json.dumps(payload)
+        results = requests.post("https://api.adsabs.harvard.edu/v1/export/custom", 
+                                headers={'Authorization': 'Bearer ' + API_KEY},
+                                data=serialized_payload)
+        abstract_strings = results.json()['export']
+        abstract_array = abstract_strings.split("\n")
+        abstract_array = list(filter(None, abstract_array))
+        return abstract_array
+    return []
 
 def get_abstracts_of_query(search_query):
-    return get_abstracts(search_for_papers(search_query))
+    paper_stats = search_for_papers(search_query);
+    return {"abstracts": get_abstracts(paper_stats)}

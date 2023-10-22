@@ -58,6 +58,9 @@ def calibration_call(data):
         return
     if "vals_tmp" not in session or session["vals_tmp"] == None:
         session["vals_tmp"] = [[],[],[],[]]#(tuple([tuple()]), tuple([tuple()]), tuple([tuple()]), tuple([tuple()]))
+    if data["id"] - 1 >= 4:
+        emit("hold on!", {})
+        return 
     session["vals_tmp"][data["id"] - 1].append(vals)
     session["vals_tmp"][data["id"] - 1] = session["vals_tmp"][data["id"] - 1].copy()
     session.modified = True
@@ -92,12 +95,8 @@ def reset_calibration(data):
 
 @socketio.on('lightcapture')
 def calibration_call(data):
-    if "vals" not in session or session["vals"] == None:
-        try:
-            print("Hello world!")
-        except Exception as e:
-            pass          
-        emit("redirect_calibrate", {})
+    if "vals" not in session or session["vals"] == None:       
+        # emit("redirect_calibrate", {})
         return
 
 
@@ -109,6 +108,7 @@ def calibration_call(data):
 
     R, G, B = session["vals"]
     newcoords = convert_coords(sub((x, y), B), (sub(R, B), sub(G, B)))
+    print(newcoords)
     emit("lightcoords", {"coords":newcoords})
 
 def sub(A, B):
@@ -137,19 +137,17 @@ def map_route():
     session['x'] = 'y'
     return render_template("map.html")
 
-@app.route('/api/data', methods=['GET'])
-def get_data():
-    # Your API logic here
-    return jsonify(ads_api.get_abstracts_of_query())
+# @app.route('/api/adsdata', methods=['GET'])
+# def get_data():
+#     # Your API logic here
+#     return jsonify(ads_api.get_abstracts_of_query())
 
-@app.route('/api_call', methods=['POST'])
+@app.route('/_adsdata', methods=['POST'])
 def api_call():
-    data = request.get_json()
-    search_query = data.get('search_query')
-    # Process the user_input and make an API call if needed
-    # Replace this with your API call logic
-    api_response = f"API response for {search_query}"
-    return jsonify({'api_response': api_response})
+    search_query = request.json
+    titles = ads_api.search_for_papers(search_query)
+    abstracts = ads_api.get_abstracts(titles)
+    return jsonify({'titles': titles, 'abstracts': abstracts})
 
 if __name__ == '__main__':
     socketio.run(app, host='127.0.0.1', debug=True,port="5002")

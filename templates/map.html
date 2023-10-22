@@ -47,6 +47,8 @@
                 <p id="objectName" class="text-white font-bold">No Object Selected</p>
                 <p id="objectRA" class="text-white font-bold">Right Ascension (East-West): No Object Selected</p>
                 <p id="objectDEC" class="text-white font-bold">Declination (North-South): No Object Selected</p>
+                <p>Related Research</p>
+                <p id="research">No Object Selected</p>
             </div>
         </div>
     </div>
@@ -62,6 +64,7 @@
 <script src="{{ url_for('static', filename='js/projection.js') }}"></script>
 <script src="{{ url_for('static', filename='js/stuquery.min.js') }}"></script>
 <script src="{{ url_for('static', filename='js/virtualsky.min.js') }}"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     function decToDMS(decimal, form) {
       // Get the degrees
@@ -129,7 +132,14 @@
         document.getElementById('objectDEC').innerText = "Declination (North-South): " +dec;
         document.getElementById('myIframe').src = src;
 
-        sendRequest(nearest.label);
+        var titleRequest = sendRequest(nearest.label);
+        titleRequest.done(function(data) {
+            if(data.titles.titles.length != 0) {
+                document.getElementById('research').innerText = data.titles.titles[0];
+            } else {
+                document.getElementById('research').innerText = "No relevant research";
+            }
+        });
     }  
 
 $(document).ready(function(){
@@ -176,20 +186,14 @@ socket.on('lightcoords', function(data) {
     console.log(data);
 })
 
-function sendRequest(input){
-    fetch('/api/data', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ string_query: input })
-        })
-        .then(response => response.json())
-        .then(data => {
-            document.getElementById('api_response').textContent = data.api_response;
-        });
-
-    console.log(response);
+function sendRequest(input) {
+    return $.ajax({
+        url:"/_adsdata",
+        type:"POST",
+        data: JSON.stringify(input),
+        dataType:"json",
+        contentType:"application/json"
+    });
 }
 </script>
 {% endblock %}
