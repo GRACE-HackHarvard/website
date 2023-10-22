@@ -1,0 +1,154 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<style>
+    .b1 {
+	  background-image: url('{{ url_for('static', filename='calibration1.png') }}');
+	background-size: 100% 100%;
+	overflow: hidden
+	}
+
+	.b2 {
+	  background-image: url('{{ url_for('static', filename='calibration2.png') }}');
+	background-size: 100% 100%;
+	overflow: hidden
+	}
+
+	.b3 {
+	  background-image: url('{{ url_for('static', filename='calibration3.png') }}');
+	background-size: 100% 100%;
+	overflow: hidden
+	}
+
+	.b4 {
+	  background-image: url('{{ url_for('static', filename='calibration4.png') }}');
+	background-size: 100% 100%;
+	overflow: hidden
+	}
+
+	p {
+      color: white;
+	  position: absolute;
+	  width: 100%;
+	  height: 20px;
+	  top: 50%;
+	  margin-top: -10px;
+	  text-align: center;
+	}
+
+	.banana {
+		width: 100vw;
+		height: 100vh;
+		color: yellow;
+		margin: none;
+	}
+
+</style>
+</head>
+<body class="b1" id="b1">
+<p id="text">
+	test
+</p>
+<video id="vidbox" class="vidbox" hidden width="1920" height="1080" controls>
+  <source src="">
+  Your browser does not support the video tag.
+</video>
+<div class="banana">&nbsp;</div>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
+<script src="{{ url_for('static', filename='js/projection.js') }}"></script>
+ <script
+  src="https://code.jquery.com/jquery-3.6.0.js"
+  integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk="
+  crossorigin="anonymous"></script>
+<script>
+	
+addEventListener("click", function() {
+    var
+          el = document.documentElement
+        , rfs =
+               el.requestFullScreen
+            || el.webkitRequestFullScreen
+            || el.mozRequestFullScreen
+    ;
+    rfs.call(el);
+});
+
+
+$(document).ready(function(){
+ // sending a connect request to the server.
+ var socket = io.connect('http://localhost:5002');
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+					var video = document.getElementById('vidbox');
+
+        let mediaDevices = navigator.mediaDevices;
+        mediaDevices
+            .getUserMedia({
+                video: true,
+                audio: false,
+            })
+            .then((stream) => {
+
+                // Changing the source of video to current stream.
+                video.srcObject = stream;
+                video.play();
+
+            })
+            .catch(alert);
+    });
+
+
+var index = 1;
+setInterval(function myFunction(){
+			var video = document.getElementById('vidbox');
+
+  const canvas = document.createElement('canvas');
+	  const ctx = canvas.getContext('2d');
+	   ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+	  const imageData = canvas.toDataURL('image/jpeg');
+	socket.emit("calibration", {data:imageData, id:index})
+}, 50);
+
+current_errors = 0;
+setInterval(function myFunction2() {
+	index++;
+	if (current_errors > 200) {
+		document.getElementById("text").innerHTML = "Failed to calibrate, trying again"
+		index = 1;
+		document.body.className = "b" + index;
+		socket.emit("reset_calibration")
+
+	}
+	if (index==5) {
+	socket.emit("done_calibration", {});
+
+	}
+	document.body.className = "b" + index;
+}, 1000);
+
+socket.on("hold on!", function myFunction3() {
+	current_errors++;
+})
+
+socket.on("leave", function myFunction4(data) {
+	$.ajax({
+		url: "http://127.0.0.1:5002/_store_session",
+		type:"POST",
+        data: JSON.stringify(data),
+        dataType:"json",
+        contentType:"application/json"
+	})
+	window.location.replace("http://127.0.0.1:5002/map");
+});
+
+socket.on("die and cry", function myFunction5(data) {
+	index = 0;
+});
+
+</script>
+</body>
+</html>

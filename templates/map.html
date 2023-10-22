@@ -17,37 +17,40 @@
 {% endblock %}
 
 {% block content %}
-    <!-- <div class="starmap-container" style="position: relative;">
-        Navigation Bar
-        <nav style="position: absolute; top: 0; width: 100%; z-index: 2;">
-            <div class="flex w-full justify-between items-center lg:px-4 md:px-3 sm:px-2 h-[7vh] bg-black">
-                <div class="flex justify-center items-center whitespace-nowrap">
-                    <img src="../static/images/logo.svg" alt="logo" class="h-10 mr-2 ml-2">
-                    <a href="/" class="text-purple-500 font-extrabold p-4 text-2xl ">GRACE</a> 
-                </div>
-        
-                <div id="navleft" class="flex w-full justify-end items-center lg:px-4 md:px-3 sm:px-2 h-[7vh]">
-                    <a href="/" class="text-white font-extrabold p-4 text-xl">Home</a>
-                    <a href="/about" class="text-white font-extrabold p-4 text-xl">About</a>
-                    <a href="/map" class="text-white font-extrabold p-4 text-xl">Star Map</a>
-                </div>
-            </div>
-        </nav>
-    </div> -->
 
-    <nav>
-        <div class="flex w-full justify-between items-center lg:px-4 md:px-3 sm:px-2 h-[7vh] bg-black">
-          <div class="flex justify-center items-center whitespace-nowrap">
-            <img src="../static/images/logo.svg" alt="logo" class="h-10 mr-2 ml-2">
-            <a href="/" class="text-purple-500 font-extrabold p-4 text-2xl">GRACE</a> 
-          </div>
-          <div id="navleft" class="flex w-full justify-end items-center lg:px-4 md:px-3 sm:px-2 h-[7vh] bg-black">
-              <a href="/" class="text-white font-extrabold p-4 text-xl">Home</a>
-              <a href="/about" class="text-white p-4 font-extrabold text-xl">About</a>
-              <a href="/map" class="text-white p-4 font-extrabold text-xl">Star Map</a>
-          </div>
+<!-- <nav style="position: absolute; top: 0; width: 100%; z-index: 2;">
+    <div class="flex w-full justify-between items-center lg:px-4 md:px-3 sm:px-2 h-[7vh] bg-transparent">
+        <div class="flex justify-center items-center whitespace-nowrap">
+            <img src="../static/logo.svg" alt="logo" class="h-10 mr-2">
+            <a href="/" class="text-purple-500 font-bold p-2 text-lg">GRACE</a> 
         </div>
-    </nav>
+        <div id="navleft" class="flex w-full justify-end items-center lg:px-4 md:px-3 sm:px-2 h-[7vh] bg-tranparent">
+            <a href="/" class="text-white font-bold p-2">Home</a>
+            <a href="/about" class="text-white p-2 font-bold">About</a>
+            <a href="/map" class="text-white p-2 font-bold">Star Map</a>
+        </div>
+    </div>
+</nav> -->
+
+<nav>
+    <div class="flex w-full justify-between items-center lg:px-4 md:px-3 sm:px-2 h-[7vh] bg-black">
+      <div class="flex justify-center items-center whitespace-nowrap">
+        <img src="../static/images/logo.svg" alt="logo" class="h-10 mr-2 ml-2">
+        <a href="/" class="text-purple-500 font-extrabold p-4 text-2xl">GRACE</a> 
+      </div>
+      <div id="navleft" class="flex w-full justify-end items-center lg:px-4 md:px-3 sm:px-2 h-[7vh] bg-black">
+          <a href="/" class="text-white font-extrabold p-4 text-xl">Home</a>
+          <a href="/about" class="text-white p-4 font-extrabold text-xl">About</a>
+          <a href="/map" class="text-white p-4 font-extrabold text-xl">Star Map</a>
+      </div>
+    </div>
+</nav>
+
+<div class="starmap-container" style="position: relative;">
+    <video id="vidbox" class="vidbox" hidden width="1920" height="1080" controls>
+        <source src="">
+        Your browser does not support the video tag.
+    </video>
 
     <!-- Star Map -->
     <div class="flex w-full h-full">
@@ -75,6 +78,10 @@
 {% endblock %}
 
 {% block scripts %}
+    <script
+  src="https://code.jquery.com/jquery-3.6.0.js"
+  integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk="
+  crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
 <script src="{{ url_for('static', filename='js/projection.js') }}"></script>
 <script src="{{ url_for('static', filename='js/stuquery.min.js') }}"></script>
@@ -146,5 +153,52 @@
         document.getElementById('objectDEC').innerText = "Declination (North-South): " +dec;
         document.getElementById('myIframe').src = src;
     }  
+
+$(document).ready(function(){
+ // sending a connect request to the server.
+ var socket = io.connect('http://localhost:5002');
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+                    var video = document.getElementById('vidbox');
+
+        let mediaDevices = navigator.mediaDevices;
+        mediaDevices
+            .getUserMedia({
+                video: true,
+                audio: false,
+            })
+            .then((stream) => {
+
+                // Changing the source of video to current stream.
+                video.srcObject = stream;
+                video.play();
+
+            })
+            .catch(alert);
+    });
+
+
+setInterval(function myFunction(){
+            var video = document.getElementById('vidbox');
+
+  const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+       ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const imageData = canvas.toDataURL('image/jpeg');
+    socket.emit("lightcapture", {data:imageData})
+}, 300 );
+
+
+socket.on('redirect_calibrate', function(data) {
+  window.location.replace("http://127.0.0.1:5002/calibration");
+});
+
+socket.on('lightcoords', function(data) {
+    console.log(data);
+})
+
+
+
 </script>
 {% endblock %}
